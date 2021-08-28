@@ -13,10 +13,29 @@ public class Controls : MonoBehaviour
     [SerializeField] float xRange = 5f;
     [SerializeField] float yRange = 5f;
     [SerializeField] float yRangeDOWN = 5f;
-    void Update() 
+    [SerializeField] float positionPitchFactor = -2f;
+    [SerializeField] float controlPitchFactor = -15f;
+    float xThrow;
+    float yThrow;
+    void Update()
     {
-        float xThrow = Input.GetAxis("Horizontal");
-        float yThrow = Input.GetAxis("Vertical");
+        ProcessTranslation();
+        ProcessRotation();
+    }
+
+    private void ProcessRotation(){
+        
+        float pitch = transform.localPosition.y * positionPitchFactor + yThrow * controlPitchFactor;
+        float yaw = 0f;
+        float roll = 0f;
+
+        transform.localRotation = Quaternion.Euler(pitch,yaw,roll);
+    }
+
+    private void ProcessTranslation()
+    {
+        xThrow = Input.GetAxis("Horizontal");
+        yThrow = Input.GetAxis("Vertical");
 
         float xOffset = xThrow * Time.deltaTime * controlSpeed;
         float rawXpos = transform.localPosition.x + xOffset;
@@ -26,7 +45,6 @@ public class Controls : MonoBehaviour
         float rawYpos = transform.localPosition.y + yOffset;
         float clampedYPos = Mathf.Clamp(rawYpos, -yRange, yRange);
 
-        transform.localPosition = new Vector3 (clampedXPos, clampedYPos, transform.localPosition.z);
-        
+        transform.localPosition = new Vector3(clampedXPos, clampedYPos, transform.localPosition.z);
     }
 }
